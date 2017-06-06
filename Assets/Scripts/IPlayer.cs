@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum PlayerStatus
 {
-    Idle, Walking
+    Idle, Walking, Fighting
 }
 
 public interface IPlayerStatusListener

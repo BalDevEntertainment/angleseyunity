@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
     public enum GameState { Idle, Playing };
     public GameState gameState = GameState.Idle;
     public GameObject uiIdle;
+    public Camera mainCamera;
 
     public PlayerController player;
     public GameObject enemyGenerator;
@@ -44,7 +45,6 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
             enemyGenerator.SendMessage("StartGenerator");
             musicPlayer.Play();
             player.SendMessage("DustPlay");
-
         }
         else if (gameState == GameState.Playing)
         {
@@ -68,6 +68,7 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
     {
         playerStatusStrategyDictionary.Add(PlayerStatus.Idle, () => new IdleStatusStrategy());
         playerStatusStrategyDictionary.Add(PlayerStatus.Walking, () => new WalkingStatusStrategy());
+        playerStatusStrategyDictionary.Add(PlayerStatus.Fighting, () => new FightingStatusStrategy());
     }
 
     public void OnStatusChanged(PlayerStatus playerStatus)
@@ -95,6 +96,15 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
         public void Execute(GameController gameController)
         {
             gameController.parallaxSpeed = gameController.defaultParallaxSpeed;
+        }
+    }
+
+    private class FightingStatusStrategy : PlayerStatusStrategy
+    {
+        public void Execute(GameController gameController)
+        {
+            gameController.parallaxSpeed = 0;
+            gameController.mainCamera.GetComponent<CameraShake>().enabled = true;
         }
     }
 }

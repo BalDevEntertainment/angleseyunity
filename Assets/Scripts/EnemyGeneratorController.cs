@@ -24,7 +24,8 @@ public class EnemyGeneratorController : MonoBehaviour {
 
     public void StartGenerator()
     {
-        InvokeRepeating("CreateEnemy", 0f, generatorTimer);
+        //InvokeRepeating("CreateEnemy", 0f, generatorTimer);
+        CreateEnemy();
     }
 
     public void StopGenerator()

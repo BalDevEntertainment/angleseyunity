@@ -9,11 +9,13 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem dust;
     private Animator animator;
     private List<IPlayerStatusListener> playerStatusListeners = new List<IPlayerStatusListener>();
+    private AudioSource attackSound;
 
     // Use this for initialization
     void Start()
     {
         animator = GetComponent<Animator>();
+        attackSound = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -42,7 +44,10 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.tag == "Enemy")
         {
-            NotifyListenersThatPlayerStatusChanged(PlayerStatus.Idle);
+            UpdateState("PlayerFighting");
+            NotifyListenersThatPlayerStatusChanged(PlayerStatus.Fighting);
+            attackSound.Play();
+            attackSound.loop = true;
         }
     }
 

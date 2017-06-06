@@ -20,6 +20,6 @@ public class EnemyController : MonoBehaviour {
 
     void OnTriggerEnter2D()
     {
-        //Stop moving.
+        rigidBody2d.velocity = Vector2.left * 0;
     }
 }
