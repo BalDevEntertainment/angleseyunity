@@ -6,10 +6,7 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour, IPlayerStatusListener
 {
-#if UNITY_EDITOR
     public float defaultParallaxSpeed = 0.05f;
-#endif
-
     public RawImage background;
     public RawImage platform;
     public enum GameState { Idle, Playing };
@@ -21,14 +18,12 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
     public GameObject enemyGenerator;
 
     private float parallaxSpeed;
-    private AudioSource musicPlayer;
     private Dictionary<PlayerStatus, Func<PlayerStatusStrategy>> playerStatusStrategyDictionary = new Dictionary<PlayerStatus, Func<PlayerStatusStrategy>>();
 
     // Use this for initialization
     void Start()
     {
         parallaxSpeed = defaultParallaxSpeed;
-        musicPlayer = GetComponent<AudioSource>();
         InitializePlayerStatusStrategyDictionary();
         player.AddPlayerStatusListener(this);
     }
@@ -43,7 +38,6 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
             uiIdle.SetActive(false);
             player.SendMessage("UpdateState", "PlayerRun");
             enemyGenerator.SendMessage("StartGenerator");
-            musicPlayer.Play();
             player.SendMessage("DustPlay");
         }
         else if (gameState == GameState.Playing)
@@ -88,6 +82,7 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
         public void Execute(GameController gameController)
         {
             gameController.parallaxSpeed = 0;
+            gameController.mainCamera.GetComponent<CameraShake>().enabled = false;
         }
     }
 
@@ -96,6 +91,7 @@ public class GameController : MonoBehaviour, IPlayerStatusListener
         public void Execute(GameController gameController)
         {
             gameController.parallaxSpeed = gameController.defaultParallaxSpeed;
+            gameController.mainCamera.GetComponent<CameraShake>().enabled = false;
         }
     }
 

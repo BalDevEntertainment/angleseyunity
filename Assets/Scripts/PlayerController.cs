@@ -2,11 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-
     public ParticleSystem dust;
+    public Slider lifeBar;
     private Animator animator;
     private List<IPlayerStatusListener> playerStatusListeners = new List<IPlayerStatusListener>();
     private AudioSource attackSound;
@@ -40,15 +41,42 @@ public class PlayerController : MonoBehaviour
         this.playerStatusListeners.Add(playerStatusListener);
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if (other.gameObject.tag == "Enemy")
+        if (collision.gameObject.tag == "Enemy" && CanBeDamaged(collision))
         {
-            UpdateState("PlayerFighting");
-            NotifyListenersThatPlayerStatusChanged(PlayerStatus.Fighting);
-            attackSound.Play();
-            attackSound.loop = true;
+            StartFight(collision.gameObject.GetComponent<DamageTarget>());
         }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (CanBeDamaged(collision))
+        {
+            StopFight(collision);
+        }
+    }
+
+    private static bool CanBeDamaged(Collider2D collision)
+    {
+        return collision.gameObject.GetComponent<DamageTarget>() != null;
+    }
+
+    private void StopFight(Collider2D collision)
+    {
+        collision.gameObject.GetComponent<DamageTarget>().OnStopReceivingDamage();
+        UpdateState("PlayerRun");
+        NotifyListenersThatPlayerStatusChanged(PlayerStatus.Walking);
+        attackSound.Stop();
+    }
+
+    private void StartFight(IDamageTarget damageTarget)
+    {
+        UpdateState("PlayerFighting");
+        NotifyListenersThatPlayerStatusChanged(PlayerStatus.Fighting);
+        attackSound.Play();
+        attackSound.loop = true;
+        damageTarget.OnStartReceivingDamage(10);
     }
 
     private void NotifyListenersThatPlayerStatusChanged(PlayerStatus status)
